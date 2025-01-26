@@ -6,23 +6,24 @@ UTF-8 Validation
 
 def validUTF8(data):
     """
-    UTF-8 Validation
+    data: a list of integers
+    Return: True if data is a valid UTF-8
+    encoding, else return False
     """
-    available_bites = 0
-    for b in data:
-        if available_bites == 0:
-            if len(str(bin(b))) == 10 and str(bin(b)).startswith('0b110'):
-                available_bites = 1
-            elif len(str(bin(b))) == 10 and str(bin(b)).startswith('0b1110'):
-                available_bites = 2
-            elif len(str(bin(b))) == 10 and str(bin(b)).startswith('0b11110'):
-                available_bites = 3
-            elif str(bin(b))[::-1][7] == '1':
-                available_bites = 1
-                break
+    byte_count = 0
+
+    for i in data:
+        if byte_count == 0:
+            if i >> 5 == 0b110 or i >> 5 == 0b1110:
+                byte_count = 1
+            elif i >> 4 == 0b1110:
+                byte_count = 2
+            elif i >> 3 == 0b11110:
+                byte_count = 3
+            elif i >> 7 == 0b1:
+                return False
         else:
-            if not str(bin(b)).startswith('0b10'):
-                available_bites = 1
-                break
-            available_bites -= 1
-    return available_bites == 0
+            if i >> 6 != 0b10:
+                return False
+            byte_count -= 1
+    return byte_count == 0
